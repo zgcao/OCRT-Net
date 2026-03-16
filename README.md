@@ -1,6 +1,6 @@
 # OCRT-Net: Ocean Color Radiative Transfer embeed Neural Network for water quality retrielvas
 
-[![Paper](Under review)](link_to_your_paper)
+[![Paper](https://img.shields.io/badge/Paper-Inform. Geo._Under_Review-blue.svg)]([link_to_your_paper](https://www.sciencedirect.com/journal/information-geography))
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8+-green.svg)](https://www.python.org/)
 [![TensorFlow 2.x](https://img.shields.io/badge/TensorFlow-2.x-orange.svg)](https://tensorflow.org/)
 
