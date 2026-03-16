@@ -1,4 +1,4 @@
-# OCRT-Net: Physics-Guided Optical Component Reconstruction and Transfer Network
+# OCRT-Net: Ocean Color Radiative Transfer embeed Neural Network for water quality retrielvas
 
 [![Paper](Under review)](link_to_your_paper)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8+-green.svg)](https://www.python.org/)
