@@ -11,8 +11,6 @@ from tensorflow.keras.regularizers import l2
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-sensor = 'OLCI'
-
 class OCRT_Predictor:
     SUPPORTED_SENSORS = {
         'OLCI':  ['OLCI_413', 'OLCI_443', 'OLCI_490', 'OLCI_510', 'OLCI_560', 'OLCI_620', 
