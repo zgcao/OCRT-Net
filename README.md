@@ -11,6 +11,10 @@ This repository provides production-ready weights trained on the global in-situ 
 - **Sentinel-3 OLCI** (12 bands)
 - **Suomi-NPP / NOAA-20/21 VIIRS** (6 bands)
 - **Sentinel-2 MSI** (7 bands)
+## Required environments
+```python
+Python 3.8+; Tensorflow 2.x; numpy; pandas;
+```
 
 ## Quick Start
 
