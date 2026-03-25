@@ -157,3 +157,43 @@ class OCRT_Predictor:
             'SPM_predicted':  10 ** preds[2].flatten(),
             'ag440_predicted': 10 ** preds[3].flatten()
         }
+
+    def img_est_ocrt(self, data,batch_size=8192):
+        """
+        执行整景影像的掩膜提取、批量推断与影像重构
+        """
+        expected_features = model.NUM_BANDS
+        if data.shape[-1] != expected_features:
+            raise ValueError(f"输入特征维度错误！OCRT-Net 需要 {expected_features} 个波段，但传入了 {data.shape[-1]} 个。")
+        im_shape = data.shape[:-1]
+        # 1. 展平图像 (H*W, Bands) 并创建 Mask
+        im_data_flat = data.reshape((-1, expected_features))
+        # 寻找无效像素 (NaN 或 小于等于 0)
+        # 因为我们在读取时给无法 log 插值的 779 赋了 NaN，这里会自动将它们判定为 invalid 并剔除
+        invalid_mask = np.any(np.isnan(im_data_flat) | (im_data_flat <= 0), axis=1)
+        # 提取纯净的有效像素矩阵送入网络
+        valid_rrs = im_data_flat[~invalid_mask]
+        print(f"      -> 影像有效水体像素数量: {len(valid_rrs)} / {len(im_data_flat)}")
+        # 2. 初始化结果数组 (全部填充满 NaN)
+        chl_flat = np.full(im_data_flat.shape[0], np.nan)
+        spm_flat = np.full(im_data_flat.shape[0], np.nan)
+        ag443_flat = np.full(im_data_flat.shape[0], np.nan)
+        # 3. 如果有效像素不为 0，则调用 OCRT-Net 进行批量推断
+        if len(valid_rrs) > 0:
+            # OCRT_Predictor 内部处理推理
+            results = self.model.predict(valid_rrs, batch_size=batch_size)
+            # 物理截断 (剔除极端的物理外推值)
+            chla_preds = results['Chla_predicted']
+            spm_preds  = results['SPM_predicted']
+            ag_preds   = results['ag440_predicted']
+            chla_preds = np.where((chla_preds < 0.01) | (chla_preds > 500), np.nan, chla_preds)
+            spm_preds  = np.where((spm_preds < 0.1)   | (spm_preds > 500), np.nan, spm_preds)
+            # 将预测结果填回对应的有效索引位置
+            chl_flat[~invalid_mask] = chla_preds
+            spm_flat[~invalid_mask] = spm_preds
+            ag443_flat[~invalid_mask] = ag_preds
+        # 4. 重新折叠回二维影像形状 (H, W)
+        chl_img = chl_flat.reshape(im_shape)
+        spm_img = spm_flat.reshape(im_shape)
+        ag443_img = ag443_flat.reshape(im_shape)
+        return chl_img, spm_img, ag443_img
